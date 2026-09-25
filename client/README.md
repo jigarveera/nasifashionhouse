@@ -1,16 +1,18 @@
-# React + Vite
+# Nasi Fashion House storefront
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 19 + Vite storefront written in JavaScript and JSX. Styling uses Tailwind CSS v4 with the NFH palette in [`src/tailwind.config.js`](src/tailwind.config.js). React components use Tailwind utilities; shared semantic styles use `@apply` in [`src/index.css`](src/index.css), alongside the detailed effects and responsive rules.
 
-Currently, two official plugins are available:
+## Run locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev
+```
 
-## React Compiler
+Check the production build and lint rules with `npm run build` and `npm run lint`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Current data and integrations
 
-## Expanding the ESLint configuration
+The catalog and journal are explicit preview fixtures in [`src/data/catalog.js`](src/data/catalog.js), exposed through the adapter in [`src/features/catalog/api.js`](src/features/catalog/api.js). Cart lines and likemarks are local to this browser. Product details, availability, and prices are sample content. Account creation, newsletter signup, and payment do not submit to a service yet.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Remote editorial photos use Unsplash image URLs. Product cards fall back to a local placeholder if an image fails to load. Replace fixture media and copy with licensed store assets and live catalog responses before launch.

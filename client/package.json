@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "nasi-fashion-house",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,8 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "framer-motion": "^13.4.4",
+    "lucide-react": "^1.48.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.4",
+    "tailwindcss": "^4.3.3",
+    "vgpu": "^0.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
