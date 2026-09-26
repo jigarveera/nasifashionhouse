@@ -1,20 +1,16 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, ChevronRight, Search, X } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { ChevronRight, UserRound, X } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { products } from '../../data/catalog';
 
-export default function NavigationBar({ shopSearch, setShopSearch, shopSearchDocked, shopSearchMainRef, shopSearchDockRef }) {
+export default function NavigationBar({ shopSearch, setShopSearch, shopSearchDocked, shopSearchDockRef, authOpen, previewProfile, onProfileClick }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const isHome = location.pathname === '/';
   const isShop = location.pathname === '/shop';
   const productSlug = location.pathname.startsWith('/product/') ? decodeURIComponent(location.pathname.slice('/product/'.length)) : null;
   const currentProduct = productSlug ? products.find((item) => item.slug === productSlug) : null;
-  const showDockedSearch = isShop && shopSearchDocked;
-
-  function handleSearchClick(event) {
-    if (!isShop) return;
-    event.preventDefault();
-    (showDockedSearch ? shopSearchDockRef : shopSearchMainRef).current?.focus();
-  }
+  const showDockedSearch = (isHome || isShop) && shopSearchDocked;
 
   return (
     <header className="site-header fixed inset-x-0 top-0 z-50 bg-transparent">
@@ -34,20 +30,22 @@ export default function NavigationBar({ shopSearch, setShopSearch, shopSearchDoc
         <AnimatePresence initial={false}>
           {showDockedSearch && (
             <motion.div className="search-field docked-search flex h-[48px] min-w-0 flex-1 items-center gap-1.5 px-3" initial={{ opacity: 0, y: 9, scale: 0.94 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -7, scale: 0.96 }} transition={{ duration: 0.22 }}>
-              <input ref={shopSearchDockRef} className="min-w-0 flex-1 border-0 bg-transparent text-[13px] text-white outline-none placeholder:text-white/50" type="text" inputMode="search" placeholder="Search" value={shopSearch} onChange={(event) => setShopSearch(event.target.value)} aria-label="Search the collection" />
+              <input ref={shopSearchDockRef} className="min-w-0 flex-1 border-0 bg-transparent text-[13px] text-white outline-none placeholder:text-white/50" type="text" inputMode="search" placeholder="Search" value={shopSearch} onChange={(event) => setShopSearch(event.target.value)} onKeyDown={(event) => { if (isHome && event.key === 'Enter') { navigate('/shop'); window.scrollTo({ top: 0, behavior: 'auto' }); } }} aria-label="Search the collection" />
               {shopSearch && <button className="grid size-5 shrink-0 place-items-center rounded-full text-white/60" type="button" onClick={() => { setShopSearch(''); shopSearchDockRef.current?.focus(); }} aria-label="Clear search"><X size={15} aria-hidden="true" /></button>}
             </motion.div>
           )}
         </AnimatePresence>
 
         <div className="flex shrink-0 items-center gap-2">
-          <Link className="nav-circle grid size-[48px] place-items-center" to="/shop" onClick={handleSearchClick} aria-label="Search the shop" aria-current={isShop ? 'page' : undefined}>
-            <Search size={22} strokeWidth={1.7} aria-hidden="true" />
-          </Link>
-          <span className="nav-circle relative grid size-[48px] place-items-center" aria-label="Notifications coming soon" role="img">
-            <Bell size={22} strokeWidth={1.7} aria-hidden="true" />
-            <span className="absolute right-[11px] top-[10px] size-1.5 rounded-full bg-white" aria-hidden="true" />
-          </span>
+          <button className="nav-circle grid size-[48px] place-items-center" type="button" onClick={onProfileClick} aria-label={previewProfile ? 'Open profile preview' : 'Open sign in'} aria-haspopup="dialog" aria-expanded={authOpen}>
+            {previewProfile ? (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#nfh-profile-gradient)" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <defs><linearGradient id="nfh-profile-gradient" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse"><stop stopColor="#DFA9F0" /><stop offset=".55" stopColor="#BB58D8" /><stop offset="1" stopColor="#7F2E97" /></linearGradient></defs>
+                <circle cx="12" cy="8" r="5" />
+                <path d="M20 21a8 8 0 0 0-16 0" />
+              </svg>
+            ) : <UserRound size={22} strokeWidth={1.7} aria-hidden="true" />}
+          </button>
         </div>
       </nav>
     </header>

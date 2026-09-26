@@ -8,17 +8,6 @@ import MerchRow from '../ui/MerchRow';
 import ChatFAQ from '../ui/ChatFAQ';
 
 const formatPrice = (amountPaise) => `₹${(amountPaise / 100).toLocaleString('en-IN')}`;
-const colorHexByName = {
-  Ivory: '#e8e2d8', Black: '#252129', Marigold: '#d99535', Sand: '#c6ad91', Rose: '#b9708d',
-  Mocha: '#786b65', Blue: '#638ec4', Charcoal: '#44434a', Cream: '#e5d9cf', Rosewood: '#934c62',
-  Plum: '#6e487a', White: '#f5f5f5', Blackberry: '#4a2057', Tan: '#b88c67', Berry: '#944366',
-};
-const accentColors = [
-  { name: 'Orchid', hex: '#8b56bb' },
-  { name: 'Peach', hex: '#f8a081' },
-  { name: 'Lilac', hex: '#c9b6ef' },
-  { name: 'Sky', hex: '#78bdf1' },
-];
 const sizeNames = { XS: 'Extra small', S: 'Small', M: 'Medium', L: 'Large', XL: 'Extra large' };
 
 function localImage(url) {
@@ -26,37 +15,37 @@ function localImage(url) {
   return photoId ? `/images/${photoId}.jpg` : url;
 }
 
-function ProductDetails({ product, bagQuantities, changeQuantity, favorites, toggleFavorite }) {
+function ProductDetails({ product, bagQuantities, bagLines, changeQuantity, favorites, toggleFavorite }) {
   const reducedMotion = useReducedMotion();
   const heartGradientId = `product-heart-${useId().replace(/[^a-z0-9]/gi, '')}`;
-  const gallery = [
-    { src: localImage(product.images[0].url), position: 'center center', scale: 1, label: 'Full view' },
-    { src: localImage(product.images[1]?.url || product.images[0].url), position: '44% 35%', scale: 1.18, label: 'Closer view' },
-    { src: localImage(product.images[0].url), position: '62% 62%', scale: 1.4, label: 'Detail view' },
-    { src: localImage(product.images[1]?.url || product.images[0].url), position: '55% 16%', scale: 1.58, label: 'Upper detail' },
-    { src: localImage(product.images[0].url), position: '45% 82%', scale: 1.48, label: 'Lower detail' },
-  ];
-  const colorOptions = [
-    { name: product.variants[0].color || 'Original', hex: colorHexByName[product.variants[0].color] || '#a982b3' },
-    ...accentColors,
-  ].filter((color, index, options) => options.findIndex((option) => option.name === color.name || option.hex === color.hex) === index).slice(0, 4);
   const [activeImage, setActiveImage] = useState(0);
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [galleryInteracted, setGalleryInteracted] = useState(false);
-  const [selectedVariantId, setSelectedVariantId] = useState(() => product.variants.find((variant) => variant.size === 'M' && variant.available)?.id || product.variants.find((variant) => variant.available)?.id || product.variants[0]?.id);
+  const [selectedSize, setSelectedSize] = useState(() => product.variants.find((variant) => variant.size === 'M' && variant.available)?.size || product.variants.find((variant) => variant.available)?.size || 'One size');
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [shareStatus, setShareStatus] = useState('');
   const dialogRef = useRef(null);
   const closeRef = useRef(null);
   const touchStartRef = useRef(null);
-  const selectedVariant = product.variants.find((variant) => variant.id === selectedVariantId) || product.variants[0];
-  const quantity = bagQuantities[product.id] || 0;
+  const colorOptions = product.colorways;
+  const selectedColor = colorOptions[selectedColorIndex] || colorOptions[0];
+  const colorVariants = product.variants.filter((variant) => variant.colorId === selectedColor.id);
+  const selectedVariant = colorVariants.find((variant) => (variant.size || 'One size') === selectedSize && variant.available) || colorVariants.find((variant) => variant.available) || colorVariants[0];
+  const colorGallery = selectedColor.images.map((image, index) => ({ src: localImage(image.url), alt: image.alt, position: 'center center', scale: 1, label: `View ${index + 1}` }));
+  const gallery = colorGallery.length > 2 ? colorGallery : [
+    { ...colorGallery[0], label: 'Full view' },
+    { ...colorGallery[1], position: '44% 35%', scale: 1.18, label: 'Closer view' },
+    { ...colorGallery[0], position: '62% 62%', scale: 1.4, label: 'Detail view' },
+    { ...colorGallery[1], position: '55% 16%', scale: 1.58, label: 'Upper detail' },
+    { ...colorGallery[0], position: '45% 82%', scale: 1.48, label: 'Lower detail' },
+  ];
+  const quantity = bagLines[selectedVariant.id] || 0;
   const favorite = Boolean(favorites[product.id]);
   const category = categories.find((item) => item.id === product.categoryId)?.name || product.categoryId;
   const care = getProductCare(product);
   const materialAnswer = care.material.startsWith('See') ? `${care.material}.` : `The material is ${care.material.toLowerCase()}.`;
-  const availableSizes = product.variants.filter((variant) => variant.available).map((variant) => variant.size || 'One size');
+  const availableSizes = colorVariants.filter((variant) => variant.available).map((variant) => variant.size || 'One size');
   const faqItems = [
     { question: `What is ${product.name} made from?`, answer: materialAnswer },
     { question: 'How do I wash and iron it?', answer: `${care.washing} ${care.ironing}` },
@@ -147,28 +136,28 @@ function ProductDetails({ product, bagQuantities, changeQuantity, favorites, tog
 
   function quantityControl() {
     return quantity ? (
-      <div className="merch-quantity inline-flex h-[36px] min-w-[82px] items-center justify-center gap-[1.265625px] rounded-full font-semibold text-white" role="group" aria-label={`${product.name} quantity`}>
-        <button className="grid size-8 place-items-center rounded-full" type="button" onClick={() => changeQuantity(product.id, -1)} aria-label={`Remove one ${product.name}`}><Minus className="translate-x-[3.625px]" size={15} aria-hidden="true" /></button>
-        <span className="min-w-3 text-center text-[13px] font-semibold" aria-live="polite">{quantity}</span>
-        <button className="grid size-8 place-items-center rounded-full" type="button" onClick={() => changeQuantity(product.id, 1)} aria-label={`Add one ${product.name}`}><Plus className="-translate-x-[3.625px]" size={15} aria-hidden="true" /></button>
+      <div className="merch-quantity product-quantity-cta grid h-[34px] w-[144px] shrink-0 grid-cols-[1fr_auto_1fr] items-center rounded-full px-2 font-semibold text-white" role="group" aria-label={`${product.name} quantity`}>
+        <button className="grid size-7 place-items-center justify-self-start rounded-full" type="button" onClick={() => changeQuantity(product.id, -1, selectedVariant.id)} aria-label={`Remove one ${product.name}`}><Minus size={16} aria-hidden="true" /></button>
+        <span className="min-w-4 text-center text-[14px] font-semibold" aria-live="polite">{quantity}</span>
+        <button className="grid size-7 place-items-center justify-self-end rounded-full" type="button" onClick={() => changeQuantity(product.id, 1, selectedVariant.id)} aria-label={`Add one ${product.name}`}><Plus size={16} aria-hidden="true" /></button>
       </div>
     ) : (
-      <button className="merch-add inline-flex h-[36px] shrink-0 items-center gap-[7.5px] rounded-full px-3 text-[11px] font-semibold tracking-[0.04em] text-white uppercase disabled:opacity-45" type="button" disabled={!selectedVariant?.available} onClick={() => changeQuantity(product.id, 1)} aria-label={`Add ${product.name} in size ${selectedVariant?.size || 'one size'} to bag`}>
-        Add <ShoppingBag size={15} strokeWidth={1.8} aria-hidden="true" />
+      <button className="merch-add product-purchase-cta inline-flex h-[34px] w-[144px] shrink-0 items-center justify-center gap-2 rounded-full px-[14px] text-[12px] font-semibold tracking-[0.04em] whitespace-nowrap text-white uppercase disabled:opacity-45" type="button" disabled={!selectedVariant?.available} onClick={() => changeQuantity(product.id, 1, selectedVariant.id)} aria-label={`Add ${product.name} in size ${selectedVariant?.size || 'one size'} to bag`}>
+        Add to bag <ShoppingBag className="shrink-0" size={16} strokeWidth={1.8} aria-hidden="true" />
       </button>
     );
   }
 
   function sizeOptions() {
-    return product.variants.map((variant) => (
+    return colorVariants.map((variant) => (
       <button
         key={variant.id}
-        className={`product-size grid size-[34px] shrink-0 place-items-center rounded-full text-[12px] font-semibold ${selectedVariantId === variant.id ? 'is-selected' : ''}`}
+        className={`product-size grid size-[34px] shrink-0 place-items-center rounded-full text-[12px] font-semibold ${selectedVariant.id === variant.id ? 'is-selected' : ''}`}
         type="button"
         disabled={!variant.available}
-        onClick={() => setSelectedVariantId(variant.id)}
+        onClick={() => setSelectedSize(variant.size || 'One size')}
         aria-label={`Size ${variant.size || 'One size'}`}
-        aria-pressed={selectedVariantId === variant.id}
+        aria-pressed={selectedVariant.id === variant.id}
       >{variant.size || 'OS'}</button>
     ));
   }
@@ -179,10 +168,10 @@ function ProductDetails({ product, bagQuantities, changeQuantity, favorites, tog
         <div className="relative aspect-square overflow-hidden rounded-[24px]" onClick={() => setGalleryInteracted(true)} onTouchStart={(event) => { touchStartRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY }; }} onTouchEnd={finishSwipe}>
           <AnimatePresence mode="wait" initial={false}>
             <motion.img
-              key={activeImage}
+              key={`${selectedColor.id}-${activeImage}`}
               className="absolute inset-0 h-full w-full object-cover"
               src={gallery[activeImage].src}
-              alt={`${product.images[0].alt}, ${gallery[activeImage].label.toLowerCase()}`}
+              alt={gallery[activeImage].alt}
               style={{ objectPosition: gallery[activeImage].position, transform: `scale(${gallery[activeImage].scale})` }}
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               transition={{ duration: reducedMotion ? 0 : 0.35 }}
@@ -200,7 +189,7 @@ function ProductDetails({ product, bagQuantities, changeQuantity, favorites, tog
           </div>
           <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3" role="group" aria-label="Choose product color">
             {colorOptions.map((color, index) => (
-              <button key={color.name} className={`product-color-swatch size-[29px] shrink-0 rounded-full ${selectedColorIndex === index ? 'is-selected' : ''}`} type="button" style={{ backgroundColor: color.hex }} onClick={() => setSelectedColorIndex(index)} aria-label={`${color.name} color`} aria-pressed={selectedColorIndex === index} title={color.name} />
+              <button key={color.id} className={`product-color-swatch size-[29px] shrink-0 rounded-full ${selectedColorIndex === index ? 'is-selected' : ''}`} type="button" style={{ backgroundColor: color.hex }} onClick={() => { setSelectedColorIndex(index); setActiveImage(0); setGalleryInteracted(true); }} aria-label={`${color.name} color`} aria-pressed={selectedColorIndex === index} title={color.name} />
             ))}
           </div>
         </div>
@@ -273,7 +262,7 @@ function ProductDetails({ product, bagQuantities, changeQuantity, favorites, tog
               <h3 className="mt-7 mb-3 text-[17px] font-semibold">Choose your size</h3>
               <div className="flex flex-wrap gap-2" role="group" aria-label="Choose size in size chart">{sizeOptions()}</div>
               <div className="mt-6 overflow-hidden rounded-[18px] border border-white/15">
-                {product.variants.map((variant) => <div key={variant.id} className={`flex items-center justify-between border-b border-white/10 px-4 py-2.5 text-[13px] last:border-b-0 ${selectedVariantId === variant.id ? 'bg-white/10' : ''}`}><span className="font-semibold">{variant.size || 'One size'}</span><span className="text-white/70">{sizeNames[variant.size] || 'Single size'}</span></div>)}
+                {colorVariants.map((variant) => <div key={variant.id} className={`flex items-center justify-between border-b border-white/10 px-4 py-2.5 text-[13px] last:border-b-0 ${selectedVariant.id === variant.id ? 'bg-white/10' : ''}`}><span className="font-semibold">{variant.size || 'One size'}</span><span className="text-white/70">{sizeNames[variant.size] || 'Single size'}</span></div>)}
               </div>
               <p className="mt-3 mb-0 text-[12px] leading-relaxed text-white/60">This is a general size label guide. Exact garment measurements can vary by style.</p>
               <div className="mt-7 flex items-center justify-between gap-3 border-t border-white/15 pt-5">
@@ -286,7 +275,7 @@ function ProductDetails({ product, bagQuantities, changeQuantity, favorites, tog
         {expanded && (
           <motion.div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/95 p-4" ref={dialogRef} role="dialog" aria-modal="true" aria-label={`Expanded ${product.name} image`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reducedMotion ? 0 : 0.2 }} onClick={(event) => { if (event.target === event.currentTarget) setExpanded(false); }}>
             <button ref={closeRef} className="product-image-action absolute right-5 top-5 grid size-11 place-items-center rounded-full" type="button" onClick={() => setExpanded(false)} aria-label="Close expanded image"><X size={20} aria-hidden="true" /></button>
-            <img className="max-h-full max-w-full rounded-[18px] object-contain" src={gallery[activeImage].src} alt={`${product.images[0].alt}, expanded`} />
+            <img className="max-h-full max-w-full rounded-[18px] object-contain" src={gallery[activeImage].src} alt={gallery[activeImage].alt} />
           </motion.div>
         )}
       </AnimatePresence>

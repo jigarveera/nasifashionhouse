@@ -2,15 +2,6 @@ import { useId } from 'react';
 import { Heart, Minus, Plus, ShoppingBag, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const swatchSets = {
-  shirts: ['#e8e2d8', '#343033', '#8d5c68'],
-  pants: ['#414b69', '#767e84', '#272727'],
-  dresses: ['#ece4da', '#83384b', '#292329'],
-  'co-ords': ['#b4aa9e', '#4a4650', '#e5d9cf'],
-  gowns: ['#ddd2d7', '#6e3b57', '#26212e'],
-  jackets: ['#b2a696', '#26292e', '#684757'],
-};
-
 function productImage(product) {
   const image = product.images[0];
   const photoId = image.url.match(/photo-[^?]+/)?.[0];
@@ -20,7 +11,7 @@ function productImage(product) {
 export default function MobileMerchCard({ product, quantity = 0, favorite = false, onQuantityChange, onToggleFavorite, className = '' }) {
   const heartGradientId = `heart-gradient-${useId().replace(/[^a-z0-9]/gi, '')}`;
   const price = product.variants[0].price.amountPaise / 100;
-  const swatches = swatchSets[product.categoryId] || ['#d0c6c5', '#393439', '#7c4c69'];
+  const swatches = product.colorways;
 
   return (
     <article className={`mobile-merch-card min-w-0 rounded-[25px] p-[5px] ${className}`}>
@@ -28,8 +19,8 @@ export default function MobileMerchCard({ product, quantity = 0, favorite = fals
         <Link className="block h-full w-full" to={`/product/${product.slug}`} aria-label={`View ${product.name}`}>
           <img className="h-full w-full rounded-[21px] object-cover" src={productImage(product)} alt={product.images[0].alt} loading="lazy" />
         </Link>
-        <div className="color-palette absolute left-2.5 top-2.5 flex items-center -space-x-1 rounded-full p-1.5" role="img" aria-label="Available color options">
-          {swatches.map((color) => <span key={color} className="size-[15px] rounded-full border border-white/80" style={{ backgroundColor: color }} />)}
+        <div className="color-palette absolute left-2.5 top-2.5 flex items-center -space-x-1 rounded-full p-1.5" role="img" aria-label={`Available colors: ${swatches.map((color) => color.name).join(', ')}`}>
+          {swatches.map((color) => <span key={color.id} className="size-[15px] rounded-full border border-white/80" style={{ backgroundColor: color.hex }} />)}
         </div>
         <button className={`favorite-button absolute right-2.5 top-2.5 grid size-9 place-items-center rounded-full text-white ${favorite ? 'border-0' : 'border border-white/40'}`} type="button" onClick={() => onToggleFavorite(product.id)} aria-label={favorite ? `Remove ${product.name} from favorites` : `Add ${product.name} to favorites`} aria-pressed={favorite}>
           <Heart size={21} strokeWidth={1.7} stroke={favorite ? `url(#${heartGradientId})` : 'currentColor'} fill={favorite ? `url(#${heartGradientId})` : 'none'} aria-hidden="true">

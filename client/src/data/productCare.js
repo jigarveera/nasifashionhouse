@@ -14,8 +14,9 @@ const categoryCare = {
 };
 
 const productMaterial = {
-  'linen-daylight-shirt': 'Linen blend',
-  'weekend-cotton-shirt': 'Cotton woven fabric',
+  'linen-daylight-shirt': 'See the item label for composition',
+  'studio-black-blouse': 'See the item label for composition',
+  'weekend-cotton-shirt': 'See the item label for composition',
   'afterglow-satin-gown': 'Satin-finish fabric',
   'relaxed-blue-denim': 'Denim',
   'studio-cotton-tee': 'Cotton jersey',
