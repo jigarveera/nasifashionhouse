@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowDownAZ, ArrowDownWideNarrow, ArrowUpAZ, ArrowUpWideNarrow, Check, IndianRupee, X } from 'lucide-react';
 import { mobileCategories, toggleCategorySelection } from '../../data/mobileCategories';
 import Slider from './Slider';
+import useWideScreen from '../../hooks/useWideScreen';
 
 const sortOptions = [
   { id: 'az', label: 'A–Z', icon: ArrowDownAZ },
@@ -18,6 +19,7 @@ export default function ShopFilterSheet({ categories, priceRange, priceCeiling, 
   const sheetRef = useRef(null);
   const closeRef = useRef(null);
   const reducedMotion = useReducedMotion();
+  const wideScreen = useWideScreen();
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -53,7 +55,7 @@ export default function ShopFilterSheet({ categories, priceRange, priceCeiling, 
 
   return (
     <motion.div className="filter-overlay fixed inset-0 z-[100] flex items-end justify-center bg-black/65" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reducedMotion ? 0 : 0.2 }} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-      <motion.div ref={sheetRef} className="filter-sheet flex max-h-[88dvh] w-full max-w-[480px] flex-col rounded-t-[30px] text-white" role="dialog" aria-modal="true" aria-labelledby="filter-sheet-title" initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ duration: reducedMotion ? 0 : 0.34, ease: [0.22, 1, 0.36, 1] }}>
+      <motion.div ref={sheetRef} className="filter-sheet flex max-h-[88dvh] w-full max-w-[480px] flex-col rounded-t-[30px] text-white" role="dialog" aria-modal="true" aria-labelledby="filter-sheet-title" initial={wideScreen ? { x: '100%' } : { y: '100%' }} animate={wideScreen ? { x: 0 } : { y: 0 }} exit={wideScreen ? { x: '100%' } : { y: '100%' }} transition={{ duration: reducedMotion ? 0 : 0.34, ease: [0.22, 1, 0.36, 1] }}>
         <div className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-white/30" aria-hidden="true" />
         <div className="flex shrink-0 items-center justify-between px-5 pb-4 pt-5">
           <h2 id="filter-sheet-title" className="m-0 text-[25px] font-semibold">Filter by</h2>

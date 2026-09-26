@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Heart, MapPin, Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { products } from '../../data/catalog';
+import useWideScreen from '../../hooks/useWideScreen';
 
 const money = (paise) => `₹${(paise / 100).toLocaleString('en-IN')}`;
 const localImage = (url) => {
@@ -108,6 +109,7 @@ export default function ShoppingSheet({ kind, onClose, bagLines, changeQuantity,
     return { product, variant, quantity: bagLines[variant.id] || 0 };
   });
   const shownLines = isCart ? cartLines : savedLines;
+  const wideScreen = useWideScreen();
   const itemCount = cartLines.reduce((total, line) => total + line.quantity, 0);
   const subtotalPaise = cartLines.reduce((total, line) => total + line.variant.price.amountPaise * line.quantity, 0);
   const selectedAddress = addresses.find((address) => address.id === selectedAddressId);
@@ -143,7 +145,7 @@ export default function ShoppingSheet({ kind, onClose, bagLines, changeQuantity,
   }
 
   return <motion.div className="shopping-overlay fixed inset-0 z-[120] flex items-end justify-center bg-black/75" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reducedMotion ? 0 : .2 }} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-    <motion.section ref={dialogRef} className="shopping-sheet flex w-full max-w-[480px] flex-col overflow-hidden rounded-t-[30px]" role="dialog" aria-modal="true" aria-labelledby="shopping-sheet-title" initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ duration: reducedMotion ? 0 : .38, ease: [0.22, 1, 0.36, 1] }}>
+    <motion.section ref={dialogRef} className="shopping-sheet flex w-full max-w-[480px] flex-col overflow-hidden rounded-t-[30px]" role="dialog" aria-modal="true" aria-labelledby="shopping-sheet-title" initial={wideScreen ? { x: '100%' } : { y: '100%' }} animate={wideScreen ? { x: 0 } : { y: 0 }} exit={wideScreen ? { x: '100%' } : { y: '100%' }} transition={{ duration: reducedMotion ? 0 : .38, ease: [0.22, 1, 0.36, 1] }}>
       <div className="shopping-handle" aria-hidden="true" />
       <div className="shopping-header"><div><p>{isCart ? 'YOUR SELECTION' : 'SAVED FOR LATER'}</p><h2 id="shopping-sheet-title">{isCart ? 'Shopping bag' : 'Wishlist'} <span>({isCart ? itemCount : savedProducts.length})</span></h2></div><button ref={closeRef} className="shopping-close" type="button" onClick={onClose} aria-label={`Close ${isCart ? 'bag' : 'wishlist'}`}><X size={20} aria-hidden="true" /></button></div>
       <div className="shopping-scroll">

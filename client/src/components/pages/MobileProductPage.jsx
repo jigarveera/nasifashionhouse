@@ -6,9 +6,17 @@ import { categories, products } from '../../data/catalog';
 import { getProductCare } from '../../data/productCare';
 import MerchRow from '../ui/MerchRow';
 import ChatFAQ from '../ui/ChatFAQ';
+import useWideScreen from '../../hooks/useWideScreen';
 
 const formatPrice = (amountPaise) => `₹${(amountPaise / 100).toLocaleString('en-IN')}`;
-const sizeNames = { XS: 'Extra small', S: 'Small', M: 'Medium', L: 'Large', XL: 'Extra large' };
+// General body measurements. These are a guide, not item-specific garment dimensions.
+const sizeMeasurements = {
+  XS: { waist: '24–26', chest: '32–34', shoulder: '13.5–14', sleeves: '21–22' },
+  S: { waist: '26–28', chest: '34–36', shoulder: '14–14.5', sleeves: '21.5–22.5' },
+  M: { waist: '28–30', chest: '36–38', shoulder: '14.5–15', sleeves: '22–23' },
+  L: { waist: '30–32', chest: '38–40', shoulder: '15–15.5', sleeves: '22.5–23.5' },
+  XL: { waist: '32–34', chest: '40–42', shoulder: '15.5–16', sleeves: '23–24' },
+};
 
 function localImage(url) {
   const photoId = url.match(/photo-[^?]+/)?.[0];
@@ -17,6 +25,7 @@ function localImage(url) {
 
 function ProductDetails({ product, bagQuantities, bagLines, changeQuantity, favorites, toggleFavorite }) {
   const reducedMotion = useReducedMotion();
+  const wideScreen = useWideScreen();
   const heartGradientId = `product-heart-${useId().replace(/[^a-z0-9]/gi, '')}`;
   const [activeImage, setActiveImage] = useState(0);
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
@@ -32,6 +41,7 @@ function ProductDetails({ product, bagQuantities, bagLines, changeQuantity, favo
   const selectedColor = colorOptions[selectedColorIndex] || colorOptions[0];
   const colorVariants = product.variants.filter((variant) => variant.colorId === selectedColor.id);
   const selectedVariant = colorVariants.find((variant) => (variant.size || 'One size') === selectedSize && variant.available) || colorVariants.find((variant) => variant.available) || colorVariants[0];
+  const displayMrpPaise = Math.round(selectedVariant.price.amountPaise * 1.4 / 100) * 100;
   const colorGallery = selectedColor.images.map((image, index) => ({ src: localImage(image.url), alt: image.alt, position: 'center center', scale: 1, label: `View ${index + 1}` }));
   const gallery = colorGallery.length > 2 ? colorGallery : [
     { ...colorGallery[0], label: 'Full view' },
@@ -148,8 +158,8 @@ function ProductDetails({ product, bagQuantities, bagLines, changeQuantity, favo
     );
   }
 
-  function sizeOptions() {
-    return colorVariants.map((variant) => (
+  function sizeButton(variant) {
+    return (
       <button
         key={variant.id}
         className={`product-size grid size-[34px] shrink-0 place-items-center rounded-full text-[12px] font-semibold ${selectedVariant.id === variant.id ? 'is-selected' : ''}`}
@@ -159,11 +169,16 @@ function ProductDetails({ product, bagQuantities, bagLines, changeQuantity, favo
         aria-label={`Size ${variant.size || 'One size'}`}
         aria-pressed={selectedVariant.id === variant.id}
       >{variant.size || 'OS'}</button>
-    ));
+    );
+  }
+
+  function sizeOptions() {
+    return colorVariants.map(sizeButton);
   }
 
   return (
-    <main className="mobile-page mx-auto min-h-screen max-w-[480px] pb-16 pt-[102px]" aria-label={`${product.name} product page`}>
+    <main className="mobile-page responsive-page product-page mx-auto min-h-screen max-w-[480px] pb-16 pt-[102px]" aria-label={`${product.name} product page`}>
+      <div className="desktop-product-breadcrumb"><Link to="/shop">Shop</Link><span aria-hidden="true">/</span><span>{product.name}</span></div>
       <section aria-label={`${product.name} images`}>
         <div className="relative aspect-square overflow-hidden rounded-[24px]" onClick={() => setGalleryInteracted(true)} onTouchStart={(event) => { touchStartRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY }; }} onTouchEnd={finishSwipe}>
           <AnimatePresence mode="wait" initial={false}>
@@ -204,16 +219,17 @@ function ProductDetails({ product, bagQuantities, bagLines, changeQuantity, favo
         </div>
       </section>
 
+      <div className="product-page-details">
       <h1 className="mt-6 mb-3 text-[29px] leading-[1.08] font-semibold tracking-[-0.03em] text-white">{product.name}</h1>
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <Link className="text-[14px] text-white/65 underline decoration-white/30 underline-offset-4" to={`/shop?category=${product.categoryId}`}>{category}</Link>
-        <div className="flex items-baseline gap-2.5">
+        <div className="flex items-baseline gap-1.5">
           <span className="text-[22px] font-semibold text-white">{formatPrice(selectedVariant.price.amountPaise)}</span>
-          {selectedVariant.compareAtPrice && <del className="text-[14px] text-white/45" aria-label={`MRP ${formatPrice(selectedVariant.compareAtPrice.amountPaise)}`}>{formatPrice(selectedVariant.compareAtPrice.amountPaise)}</del>}
+          <del className="text-[14px] text-white/45" aria-label={`MRP ${formatPrice(displayMrpPaise)}`}>{formatPrice(displayMrpPaise)}</del>
         </div>
       </div>
 
-      <div className="mt-6 flex items-end justify-between gap-2.5">
+      <div className="product-size-purchase-row mt-6 flex items-end justify-between gap-2.5">
         <div className="min-w-0 flex-1">
           <div className="mb-2 flex items-center justify-between gap-2">
             <div className="flex items-center gap-1">
@@ -237,6 +253,7 @@ function ProductDetails({ product, bagQuantities, bagLines, changeQuantity, favo
         </dl>
         <p className="mt-4 mb-0 text-[11px] text-white/45">For exact care instructions, follow the label on your item.</p>
       </section>
+      </div>
 
       {similar.length ? <MerchRow title={`Similar to ${product.name}`} products={similar} {...merchActions} /> : (
         <section className="mt-9" aria-label={`Similar to ${product.name}`}><h2 className="mb-3 text-[23px] font-medium">Similar to {product.name}</h2><p className="text-[13px] text-white/55">More {category.toLowerCase()} are coming soon.</p></section>
@@ -252,7 +269,7 @@ function ProductDetails({ product, bagQuantities, bagLines, changeQuantity, favo
       <AnimatePresence>
         {detailsOpen && (
           <motion.div className="product-overlay fixed inset-0 z-[100] flex items-end justify-center bg-black/65" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reducedMotion ? 0 : 0.2 }} onClick={(event) => { if (event.target === event.currentTarget) setDetailsOpen(false); }}>
-            <motion.div ref={dialogRef} className="product-info-sheet flex max-h-[85dvh] w-full max-w-[480px] flex-col overflow-y-auto rounded-t-[30px] px-5 pb-[calc(24px+env(safe-area-inset-bottom))] text-white" role="dialog" aria-modal="true" aria-labelledby="size-chart-heading" initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ duration: reducedMotion ? 0 : 0.34, ease: [0.22, 1, 0.36, 1] }}>
+            <motion.div ref={dialogRef} className="product-info-sheet flex max-h-[85dvh] w-full max-w-[480px] flex-col overflow-y-auto rounded-t-[30px] px-5 pb-[calc(24px+env(safe-area-inset-bottom))] text-white" role="dialog" aria-modal="true" aria-labelledby="size-chart-heading" initial={wideScreen ? { x: '100%' } : { y: '100%' }} animate={wideScreen ? { x: 0 } : { y: 0 }} exit={wideScreen ? { x: '100%' } : { y: '100%' }} transition={{ duration: reducedMotion ? 0 : 0.34, ease: [0.22, 1, 0.36, 1] }}>
               <div className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-white/30" aria-hidden="true" />
               <div className="mt-5 flex items-start justify-between gap-3">
                 <div><p className="m-0 text-[12px] font-semibold tracking-[0.12em] text-white/70 uppercase">Nasi Fashion House</p><h2 id="size-chart-heading" className="m-0 mt-1 text-[25px] leading-tight font-semibold">Size chart</h2></div>
@@ -261,12 +278,22 @@ function ProductDetails({ product, bagQuantities, bagLines, changeQuantity, favo
               <p className="mt-2 mb-0 text-[14px] text-white/70">{product.name}</p>
               <h3 className="mt-7 mb-3 text-[17px] font-semibold">Choose your size</h3>
               <div className="flex flex-wrap gap-2" role="group" aria-label="Choose size in size chart">{sizeOptions()}</div>
-              <div className="mt-6 overflow-hidden rounded-[18px] border border-white/15">
-                {colorVariants.map((variant) => <div key={variant.id} className={`flex items-center justify-between border-b border-white/10 px-4 py-2.5 text-[13px] last:border-b-0 ${selectedVariant.id === variant.id ? 'bg-white/10' : ''}`}><span className="font-semibold">{variant.size || 'One size'}</span><span className="text-white/70">{sizeNames[variant.size] || 'Single size'}</span></div>)}
+              <div className="mt-6 overflow-x-auto rounded-[18px] border border-white/15">
+                <table className="size-guide-table w-full min-w-[340px] border-collapse text-center text-[11px]">
+                  <caption className="sr-only">General body measurements in inches for {product.name}</caption>
+                  <thead><tr><th scope="col">Size</th><th scope="col">Waist</th><th scope="col">Chest</th><th scope="col">Shoulder</th><th scope="col">Sleeves</th></tr></thead>
+                  <tbody>{colorVariants.map((variant) => {
+                    const measurements = sizeMeasurements[variant.size];
+                    return <tr key={variant.id} className={selectedVariant.id === variant.id ? 'is-selected' : ''}>
+                      <th scope="row">{sizeButton(variant)}</th>
+                      <td>{measurements?.waist || '—'}</td><td>{measurements?.chest || '—'}</td><td>{measurements?.shoulder || '—'}</td><td>{measurements?.sleeves || '—'}</td>
+                    </tr>;
+                  })}</tbody>
+                </table>
               </div>
-              <p className="mt-3 mb-0 text-[12px] leading-relaxed text-white/60">This is a general size label guide. Exact garment measurements can vary by style.</p>
+              <p className="mt-3 mb-0 text-[12px] leading-relaxed text-white/60">General body measurements in inches. Garment measurements can vary by style; check the item label for exact fit.</p>
               <div className="mt-7 flex items-center justify-between gap-3 border-t border-white/15 pt-5">
-                <div className="flex flex-col"><span className="text-[21px] font-semibold">{formatPrice(selectedVariant.price.amountPaise)}</span>{selectedVariant.compareAtPrice && <del className="text-[13px] text-white/45">{formatPrice(selectedVariant.compareAtPrice.amountPaise)}</del>}</div>
+                <div className="flex items-baseline gap-2"><span className="text-[21px] font-semibold">{formatPrice(selectedVariant.price.amountPaise)}</span><del className="text-[13px] text-white/45" aria-label={`MRP ${formatPrice(displayMrpPaise)}`}>{formatPrice(displayMrpPaise)}</del></div>
                 {quantityControl()}
               </div>
             </motion.div>
@@ -286,6 +313,6 @@ function ProductDetails({ product, bagQuantities, bagLines, changeQuantity, favo
 export default function MobileProductPage(props) {
   const { slug } = useParams();
   const product = products.find((item) => item.slug === slug && item.published);
-  if (!product) return <main className="mobile-page mx-auto min-h-screen max-w-[480px] pt-[120px] text-center"><h1 className="text-[25px] font-semibold">This piece is unavailable</h1><Link className="mt-4 inline-block text-nasi-orchid-300 underline" to="/shop">Back to the shop</Link></main>;
+  if (!product) return <main className="mobile-page responsive-page mx-auto min-h-screen max-w-[480px] pt-[120px] text-center"><h1 className="text-[25px] font-semibold">This piece is unavailable</h1><Link className="mt-4 inline-block text-nasi-orchid-300 underline" to="/shop">Back to the shop</Link></main>;
   return <ProductDetails key={product.id} product={product} {...props} />;
 }

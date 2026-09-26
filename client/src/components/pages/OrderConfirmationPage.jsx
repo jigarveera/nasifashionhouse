@@ -2,7 +2,7 @@ import { ArrowRight, PackageCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function OrderConfirmationPage() {
-  return <main className="mobile-page checkout-page mx-auto min-h-screen max-w-[480px] pt-[120px]" aria-labelledby="order-confirmation-title">
+  return <main className="mobile-page checkout-page mx-auto min-h-screen max-w-[480px] md:max-w-[800px] pt-[120px]" aria-labelledby="order-confirmation-title">
     <div className="confirmation-icon"><PackageCheck size={30} strokeWidth={1.5} aria-hidden="true" /></div>
     <p className="checkout-eyebrow">ORDER CONFIRMATION</p>
     <h1 id="order-confirmation-title">No confirmed order yet.</h1>

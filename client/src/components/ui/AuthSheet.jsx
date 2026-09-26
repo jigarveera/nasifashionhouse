@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Apple, ArrowLeft, ArrowRight, Check, Flower2, Gem, Heart, LockKeyhole, LogOut, Mail, PackageOpen, Palette, Ruler, Scissors, Shirt, ShoppingBag, Sparkles, Star, Tag, UserRound, X } from 'lucide-react';
+import useWideScreen from '../../hooks/useWideScreen';
 
 const emptyCode = () => Array(6).fill('');
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -39,6 +40,7 @@ const authDoodles = createAuthDoodles();
 
 export default function AuthSheet({ onClose, onVerified, onSignOut, previewProfile, orders = [] }) {
   const reducedMotion = useReducedMotion();
+  const wideScreen = useWideScreen();
   const [mode, setMode] = useState('signin');
   const [step, setStep] = useState('details');
   const [name, setName] = useState('');
@@ -156,7 +158,7 @@ export default function AuthSheet({ onClose, onVerified, onSignOut, previewProfi
 
   return (
     <motion.div className="auth-overlay fixed inset-0 z-[150] flex items-end justify-center bg-black/75" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reducedMotion ? 0 : .2 }} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-      <motion.div ref={dialogRef} className="auth-sheet w-full max-w-[480px] text-white" role="dialog" aria-modal="true" aria-labelledby="auth-sheet-title" initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ duration: reducedMotion ? 0 : .38, ease: [0.22, 1, 0.36, 1] }}>
+      <motion.div ref={dialogRef} className="auth-sheet w-full max-w-[480px] text-white" role="dialog" aria-modal="true" aria-labelledby="auth-sheet-title" initial={wideScreen ? { x: '100%' } : { y: '100%' }} animate={wideScreen ? { x: 0 } : { y: 0 }} exit={wideScreen ? { x: '100%' } : { y: '100%' }} transition={{ duration: reducedMotion ? 0 : .38, ease: [0.22, 1, 0.36, 1] }}>
         <div ref={contentRef} className="auth-sheet-body">
           <div className="auth-sheet-header">
             <div><p className="auth-eyebrow">NASI FASHION HOUSE / ACCOUNT</p><h2 id="auth-sheet-title">{step === 'success' ? 'All set.' : title}</h2></div>

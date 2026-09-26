@@ -83,10 +83,10 @@ export default function MobileShopPage({ bagQuantities, changeQuantity, favorite
   const filterCount = Number(!selectedCategories.includes('all')) + Number(priceFiltered) + Number(sortBy !== 'featured');
 
   return (
-    <main className="mobile-page mx-auto min-h-screen max-w-[480px] pb-16 pt-[108px]" aria-label="Shop page">
+    <main className="mobile-page responsive-page mx-auto min-h-screen max-w-[480px] pb-16 pt-[108px]" aria-label="Shop page">
       <h1 className="hero-gradient-title mb-6 text-[34px] leading-none font-semibold tracking-[-0.035em]">Find your style.</h1>
 
-      <motion.div ref={searchRowRef} className="mb-5 flex items-center gap-2.5" animate={{ opacity: searchDocked ? 0.35 : 1 }} transition={{ duration: 0.2 }}>
+      <motion.div ref={searchRowRef} className="page-search-row mb-5 flex items-center gap-2.5" animate={{ opacity: searchDocked ? 0.35 : 1 }} transition={{ duration: 0.2 }}>
         <div className="search-field flex h-[52px] min-w-0 flex-1 items-center gap-2 rounded-full px-5">
           <input ref={searchMainRef} className="w-full min-w-0 flex-1 border-0 bg-transparent text-[15px] text-white outline-none placeholder:text-white/50" type="text" inputMode="search" placeholder="Search the collection" value={search} onChange={(event) => setSearch(event.target.value)} aria-label="Search the collection" />
           {search && <button className="grid size-7 shrink-0 place-items-center rounded-full text-white/55" type="button" onClick={() => { setSearch(''); searchMainRef.current?.focus(); }} aria-label="Clear search"><X size={19} aria-hidden="true" /></button>}
@@ -123,7 +123,7 @@ export default function MobileShopPage({ bagQuantities, changeQuantity, favorite
           <h2 id="shop-results-heading" className="m-0 text-[23px] font-medium">Pieces for you</h2>
           <span className="shrink-0 text-[13px] text-white/50">{visibleProducts.length} pieces</span>
         </div>
-        {visibleProducts.length ? (
+        {visibleProducts.length ? (<>
           <div className="shop-product-grid relative grid grid-cols-2 gap-x-4">
             <svg className="pointer-events-none absolute -top-1 right-0 z-10 h-[72px] w-[84px] text-white" viewBox="0 0 100 90" fill="none" aria-hidden="true">
               <path d="M16 6c14-4 30 7 38 19 6 9 5 17-3 19-8 2-19-6-21-15-2-8 4-14 13-13 16 2 35 19 32 37-2 11-12 20-23 26" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
@@ -133,7 +133,10 @@ export default function MobileShopPage({ bagQuantities, changeQuantity, favorite
               {column.map((product) => <MobileMerchCard key={product.id} className="shop-merch-card" product={product} quantity={bagQuantities[product.id] || 0} favorite={Boolean(favorites[product.id])} onQuantityChange={changeQuantity} onToggleFavorite={toggleFavorite} />)}
             </div>)}
           </div>
-        ) : (
+          <div className="shop-product-grid-desktop">
+            {visibleProducts.map((product) => <MobileMerchCard key={product.id} className="shop-merch-card" product={product} quantity={bagQuantities[product.id] || 0} favorite={Boolean(favorites[product.id])} onQuantityChange={changeQuantity} onToggleFavorite={toggleFavorite} />)}
+          </div>
+        </>) : (
           <div className="rounded-[24px] border border-white/10 bg-white/[0.04] px-5 py-9 text-center">
             <p className="m-0 text-[17px] font-medium">No pieces found.</p>
             <p className="mt-2 mb-0 text-[14px] text-white/55">Try another search or change your filters.</p>

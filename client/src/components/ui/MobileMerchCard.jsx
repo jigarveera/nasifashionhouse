@@ -11,6 +11,7 @@ function productImage(product) {
 export default function MobileMerchCard({ product, quantity = 0, favorite = false, onQuantityChange, onToggleFavorite, className = '' }) {
   const heartGradientId = `heart-gradient-${useId().replace(/[^a-z0-9]/gi, '')}`;
   const price = product.variants[0].price.amountPaise / 100;
+  const mrp = Math.round(price * 1.4);
   const swatches = product.colorways;
 
   return (
@@ -41,7 +42,10 @@ export default function MobileMerchCard({ product, quantity = 0, favorite = fals
           <span className="inline-flex shrink-0 items-center gap-0.5 text-[12px] text-white/85" aria-label="Sample rating 4.9 out of 5"><Star size={14} strokeWidth={1.6} aria-hidden="true" /> 4.9</span>
         </div>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-1.5">
-          <p className="m-0 text-[20px] leading-none font-medium tracking-[-0.025em] text-white">₹{price.toLocaleString('en-IN')}</p>
+          <div className="merch-price-group inline-flex items-baseline gap-1.5 whitespace-nowrap">
+            <p className="m-0 text-[20px] leading-none font-medium tracking-[-0.025em] text-white">₹{price.toLocaleString('en-IN')}</p>
+            <del className="merch-card-mrp hidden text-[12px] text-white/45" aria-label={`MRP ₹${mrp.toLocaleString('en-IN')}`}>₹{mrp.toLocaleString('en-IN')}</del>
+          </div>
           {quantity ? (
             <div className="merch-quantity inline-flex h-[36px] min-w-[82px] items-center justify-center gap-[1.265625px] rounded-full font-semibold text-white" role="group" aria-label={`${product.name} quantity`}>
               <button className="grid size-8 place-items-center rounded-full" type="button" onClick={() => onQuantityChange(product.id, -1)} aria-label={`Remove one ${product.name}`}><Minus className="translate-x-[3.625px]" size={15} aria-hidden="true" /></button>

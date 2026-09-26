@@ -12,7 +12,7 @@ export default function MerchRow({ title, products, bagQuantities, changeQuantit
         {products.map((product) => (
           <MobileMerchCard
             key={product.id}
-            className="w-[190px] shrink-0"
+            className="w-[190px] shrink-0 md:w-[230px] xl:w-[250px]"
             product={product}
             quantity={bagQuantities[product.id] || 0}
             favorite={Boolean(favorites[product.id])}

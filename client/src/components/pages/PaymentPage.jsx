@@ -8,7 +8,7 @@ export default function PaymentPage({ bagLines, address, onOpenCart }) {
   const lines = products.flatMap((product) => product.variants.filter((variant) => Number(bagLines[variant.id]) > 0).map((variant) => ({ product, variant, quantity: bagLines[variant.id] })));
   const subtotalPaise = lines.reduce((total, line) => total + line.variant.price.amountPaise * line.quantity, 0);
 
-  return <main className="mobile-page checkout-page mx-auto min-h-screen max-w-[480px] pt-[106px]" aria-labelledby="checkout-title">
+  return <main className="mobile-page checkout-page mx-auto min-h-screen max-w-[480px] md:max-w-[800px] pt-[106px]" aria-labelledby="checkout-title">
     <Link className="checkout-back" to="/shop"><ArrowLeft size={17} aria-hidden="true" /> Back to shop</Link>
     <p className="checkout-eyebrow">CHECKOUT / PAYMENT</p>
     <h1 id="checkout-title">Review before payment.</h1>

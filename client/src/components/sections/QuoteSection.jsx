@@ -157,7 +157,7 @@ export default function QuoteSection() {
     <section ref={sectionRef} className="home-quote" aria-labelledby="home-quote-heading">
       <div className="home-quote-composition">
         <img className="home-quote-model" src={fashionModel} alt="Woman in a floral blouse and plum skirt" loading="lazy" />
-        <h2 id="home-quote-heading" className="home-quote-text"><span>STYLE</span><span>WITHOUT</span><span>COMPROMISE</span></h2>
+        <div className="home-quote-type"><h2 id="home-quote-heading" className="home-quote-text"><span>STYLE</span><span>WITHOUT</span><span>COMPROMISE</span></h2></div>
       </div>
       <canvas ref={canvasRef} className="home-quote-petals" aria-hidden="true" />
     </section>

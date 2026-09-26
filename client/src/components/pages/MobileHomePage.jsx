@@ -42,9 +42,9 @@ export default function MobileHomePage({ bagQuantities, changeQuantity, favorite
   }
 
   return (
-    <main className="mobile-page mx-auto min-h-screen max-w-[480px] pb-16 pt-[108px]" aria-label="Home page">
+    <main className="mobile-page responsive-page mx-auto min-h-screen max-w-[480px] pb-16 pt-[108px]" aria-label="Home page">
       <h1 className="sr-only">Nasi Fashion House</h1>
-      <motion.div ref={searchRowRef} className="mb-5 flex items-center gap-2.5" animate={{ opacity: searchDocked ? 0.35 : 1 }} transition={{ duration: 0.2 }}>
+      <motion.div ref={searchRowRef} className="page-search-row mb-5 flex items-center gap-2.5" animate={{ opacity: searchDocked ? 0.35 : 1 }} transition={{ duration: 0.2 }}>
         <div className="search-field flex h-[52px] min-w-0 flex-1 items-center gap-2 rounded-full px-5">
           <input ref={searchMainRef} className="w-full min-w-0 flex-1 border-0 bg-transparent text-[15px] text-white outline-none placeholder:text-white/50" type="text" inputMode="search" placeholder="Search the collection" value={search} onChange={(event) => setSearch(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') openShop(); }} aria-label="Search the collection" />
           {search && <button className="grid size-7 shrink-0 place-items-center rounded-full text-white/55" type="button" onClick={() => { setSearch(''); searchMainRef.current?.focus(); }} aria-label="Clear search"><X size={19} aria-hidden="true" /></button>}
