@@ -1,11 +1,41 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Apple, ArrowLeft, ArrowRight, Check, LockKeyhole, LogOut, Mail, PackageOpen, UserRound, X } from 'lucide-react';
-import gownModel from '../../assets/model/model-gown.png';
-import sareeModel from '../../assets/model/model-saree.png';
+import { Apple, ArrowLeft, ArrowRight, Check, Flower2, Gem, Heart, LockKeyhole, LogOut, Mail, PackageOpen, Palette, Ruler, Scissors, Shirt, ShoppingBag, Sparkles, Star, Tag, UserRound, X } from 'lucide-react';
 
 const emptyCode = () => Array(6).fill('');
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+const authDoodleIcons = [Shirt, Heart, ShoppingBag, Sparkles, Gem, Scissors, Flower2, Tag, Star, Palette, Ruler, Mail];
+const authDoodleColors = ['#d7c8de', '#c7a9cd', '#a982b3', '#ead8ee'];
+
+function createAuthDoodles() {
+  let seed = Math.floor(Math.random() * 0xffffffff);
+  const random = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 0x100000000;
+  };
+  const doodles = [];
+
+  // Each band is 5% of the sheet's height, with 15% fewer icons than the band below.
+  for (let band = 0; band < 20; band += 1) {
+    const count = Math.max(1, Math.round(16 * .85 ** band));
+    for (let index = 0; index < count; index += 1) {
+      doodles.push({
+        Icon: authDoodleIcons[Math.floor(random() * authDoodleIcons.length)],
+        left: `${((index + .08 + random() * .84) / count) * 100}%`,
+        top: `${(1 - (band + .08 + random() * .84) / 20) * 100}%`,
+        angle: `${Math.round(random() * 90 - 45)}deg`,
+        size: Math.round(14 + random() * 14),
+        opacity: .42 + random() * .52,
+        color: authDoodleColors[Math.floor(random() * authDoodleColors.length)],
+      });
+    }
+  }
+
+  return doodles;
+}
+
+// Generate once per page load so the scattered pattern stays still while someone signs in.
+const authDoodles = createAuthDoodles();
 
 export default function AuthSheet({ onClose, onVerified, onSignOut, previewProfile, orders = [] }) {
   const reducedMotion = useReducedMotion();
@@ -186,8 +216,11 @@ export default function AuthSheet({ onClose, onVerified, onSignOut, previewProfi
             )}
           </AnimatePresence>
         </div>
-        <div className={`auth-art ${isSignup ? 'is-signup' : ''}`} aria-hidden="true">
-          <img src={isSignup ? sareeModel : gownModel} alt="" />
+        <div className="auth-art" aria-hidden="true" />
+        <div className="auth-doodle-pattern" aria-hidden="true">
+          {authDoodles.map(({ Icon, left, top, angle, size, opacity, color }, index) => (
+            <Icon key={index} size={size} strokeWidth={1.2} style={{ left, top, opacity, color, transform: `translate(-50%, -50%) rotate(${angle})` }} />
+          ))}
         </div>
       </motion.div>
     </motion.div>

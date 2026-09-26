@@ -37,14 +37,8 @@ export default function NavigationBar({ shopSearch, setShopSearch, shopSearchDoc
         </AnimatePresence>
 
         <div className="flex shrink-0 items-center gap-2">
-          <button className="nav-circle grid size-[48px] place-items-center" type="button" onClick={onProfileClick} aria-label={previewProfile ? 'Open profile preview' : 'Open sign in'} aria-haspopup="dialog" aria-expanded={authOpen}>
-            {previewProfile ? (
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#nfh-profile-gradient)" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <defs><linearGradient id="nfh-profile-gradient" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse"><stop stopColor="#DFA9F0" /><stop offset=".55" stopColor="#BB58D8" /><stop offset="1" stopColor="#7F2E97" /></linearGradient></defs>
-                <circle cx="12" cy="8" r="5" />
-                <path d="M20 21a8 8 0 0 0-16 0" />
-              </svg>
-            ) : <UserRound size={22} strokeWidth={1.7} aria-hidden="true" />}
+          <button className={`nav-circle grid size-[48px] place-items-center ${previewProfile ? 'is-signed-in' : ''}`} type="button" onClick={onProfileClick} aria-label={previewProfile ? 'Open profile preview' : 'Open sign in'} aria-haspopup="dialog" aria-expanded={authOpen}>
+            <UserRound size={22} strokeWidth={previewProfile ? 2.1 : 1.7} aria-hidden="true" />
           </button>
         </div>
       </nav>
