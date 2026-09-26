@@ -30,7 +30,7 @@ Build a reusable design system rather than reproducing any reference screen. The
 ## 2. Brand foundation
 
 - **Logo:** use the approved plain-H `NFH-logo.svg`; no beak, glitter, extra pictogram, or tangerine accent. Place a copy at `public/brand/NFH-logo.svg` when integrating.
-- **Typeface:** [Barlow](https://fonts.google.com/specimen/Barlow). Use 700–800 for display, 600–700 for navigation and buttons, 400–500 for product copy and form text. Keep body text legible; avoid ultra-tight tracking below 18px. Use a system sans fallback while it loads.
+- **Typeface:** [Syne](https://fonts.google.com/specimen/Syne). Use 700–800 for display, 600–700 for navigation and buttons, 400–500 for product copy and form text. Keep body text legible; avoid ultra-tight tracking below 18px. Use a system sans fallback while it loads.
 - **Voice:** concise, assured, welcoming. Prefer “Discover your next favorite” over exaggerated luxury claims.
 - **Photography:** real outfits on varied women, garment details and fabric texture, consistent color grading, practical crop and fit representation. Never stretch imagery or place important garment areas under text/glass.
 

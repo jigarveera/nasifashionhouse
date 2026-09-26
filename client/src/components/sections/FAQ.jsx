@@ -1,13 +1,12 @@
-import { useState } from 'react';
-import { Plus, Minus } from 'lucide-react';
+import ChatFAQ from '../ui/ChatFAQ';
 
 const questions = [
-  { question: 'How do I find a piece in my size?', answer: 'Open a product to see its sample size options, or use the size filter in the shop. Availability shown here is part of the preview catalog.' },
-  { question: 'Can I save pieces for later?', answer: 'Yes. Tap the heart on a product to add it to your likemarks in this browser. Account syncing will be added when sign-in is connected.' },
-  { question: 'Is checkout available?', answer: 'The bag and checkout screen are previews. Payments and order placement will become available after the store services are connected.' },
+  { question: 'How do I choose my size?', answer: 'Open a product to see its available sizes. Tap the info icon beside Size for a general size guide; exact garment measurements can vary by style.' },
+  { question: 'Can I save a piece I like?', answer: 'Yes. Tap the heart on a product to mark it as a favorite during this visit.' },
+  { question: 'How should I care for my piece?', answer: 'Each product page includes material and general care guidance. Follow the label on your item for exact washing and ironing instructions.' },
+  { question: 'Can I place an order here?', answer: 'This storefront is a preview. You can explore products and use the demo bag, but checkout and payments are not connected yet.' },
 ];
 
 export default function FAQ() {
-  const [open, setOpen] = useState(0);
-  return <section className="section faq-section"><div className="container faq-grid"><div><span className="eyebrow">GOOD TO KNOW</span><h2>A few <em>answers.</em></h2><p>Explore how this storefront preview works.</p></div><div className="faq-items">{questions.map((item, index) => <div className="faq-item" key={item.question}><h3><button type="button" aria-expanded={open === index} aria-controls={`faq-answer-${index}`} onClick={() => setOpen(open === index ? -1 : index)}>{item.question}{open === index ? <Minus size={19} /> : <Plus size={19} />}</button></h3>{open === index && <p id={`faq-answer-${index}`}>{item.answer}</p>}</div>)}</div></div></section>;
+  return <ChatFAQ className="home-faq" items={questions} />;
 }

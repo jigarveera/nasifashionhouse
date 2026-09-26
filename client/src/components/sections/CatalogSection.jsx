@@ -14,16 +14,14 @@ export default function CatalogSection({ sale = false }) {
   const q = params.get('q') || '';
   const sort = params.get('sort') || 'featured';
   const size = params.get('size') || '';
-  const page = Math.max(1, Number(params.get('page')) || 1);
+  const page = Number(params.get('page')) || 1;
 
   function update(key, value) {
-    setParams((current) => {
-      const next = new URLSearchParams(current);
-      if (value && value !== 'all' && value !== 'featured') next.set(key, value);
-      else next.delete(key);
-      if (key !== 'page') next.delete('page');
-      return next;
-    });
+    const next = new URLSearchParams(params);
+    if (value && value !== 'all' && value !== 'featured') next.set(key, value);
+    else next.delete(key);
+    if (key !== 'page') next.delete('page');
+    setParams(next);
   }
 
   useEffect(() => {
@@ -40,11 +38,9 @@ export default function CatalogSection({ sale = false }) {
     timer.current = window.setTimeout(() => update('q', value.trim()), 250);
   }
   function clearAll() {
-    setParams((current) => {
-      const next = new URLSearchParams(current);
-      ['category', 'q', 'size', 'sort', 'page'].forEach((key) => next.delete(key));
-      return next;
-    });
+    const next = new URLSearchParams(params);
+    ['category', 'q', 'size', 'sort', 'page'].forEach((key) => next.delete(key));
+    setParams(next);
   }
 
   return <section className="catalog-section container min-h-screen">

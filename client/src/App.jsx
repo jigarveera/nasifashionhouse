@@ -1,33 +1,68 @@
-import { lazy, Suspense } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
-import StoreProvider from './app/StoreProvider';
-import PublicLayout from './app/PublicLayout';
-
-const HomePage = lazy(() => import('./components/pages/HomePage'));
-const ShopPage = lazy(() => import('./components/pages/ShopPage'));
-const SalePage = lazy(() => import('./components/pages/SalePage'));
-const BlogPage = lazy(() => import('./components/pages/BlogPage'));
-const ArticlePage = lazy(() => import('./components/pages/ArticlePage'));
-const ProductPage = lazy(() => import('./components/pages/ProductPage'));
-const LoginPage = lazy(() => import('./components/pages/LoginPage'));
-const SignupPage = lazy(() => import('./components/pages/SignupPage'));
-const PaymentPage = lazy(() => import('./components/pages/PaymentPage'));
-const PageNotFound = lazy(() => import('./components/pages/PageNotFound'));
+import { useEffect, useRef, useState } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import NavigationBar from './components/ui/NavigationBar';
+import MobileHomePage from './components/pages/MobileHomePage';
+import MobileShopPage from './components/pages/MobileShopPage';
+import MobileProductPage from './components/pages/MobileProductPage';
+import Footer from './components/sections/Footer';
 
 export default function App() {
-  const location = useLocation();
-  return <StoreProvider><Suspense fallback={<div className="page-loader" role="status">Finding your next favorite…</div>}><Routes location={location}>
-    <Route element={<PublicLayout />}>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/shop" element={<ShopPage />} />
-      <Route path="/sale" element={<SalePage />} />
-      <Route path="/blog" element={<BlogPage />} />
-      <Route path="/blog/:slug" element={<ArticlePage />} />
-      <Route path="/product/:slug" element={<ProductPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
-      <Route path="/checkout/payment" element={<PaymentPage />} />
-      <Route path="*" element={<PageNotFound />} />
-    </Route>
-  </Routes></Suspense></StoreProvider>;
+  const [bagQuantities, setBagQuantities] = useState(() => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem('nfh-bag-quantities') || '{}');
+      return saved && typeof saved === 'object' && !Array.isArray(saved) ? saved : {};
+    } catch {
+      return {};
+    }
+  });
+  const [favorites, setFavorites] = useState({});
+  const [shopSearch, setShopSearch] = useState('');
+  const [shopSearchDocked, setShopSearchDocked] = useState(false);
+  const shopSearchMainRef = useRef(null);
+  const shopSearchDockRef = useRef(null);
+
+  useEffect(() => {
+    if (shopSearchDocked && document.activeElement === shopSearchMainRef.current) {
+      shopSearchDockRef.current?.focus({ preventScroll: true });
+    } else if (!shopSearchDocked && document.activeElement === shopSearchDockRef.current) {
+      shopSearchMainRef.current?.focus({ preventScroll: true });
+    }
+  }, [shopSearchDocked]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('nfh-bag-quantities', JSON.stringify(bagQuantities));
+    } catch {
+      // The bag still works for this visit when storage is unavailable.
+    }
+  }, [bagQuantities]);
+
+  function changeQuantity(productId, amount) {
+    setBagQuantities((current) => {
+      const next = { ...current };
+      const quantity = Math.max(0, Math.min(99, (Number(next[productId]) || 0) + amount));
+      if (quantity) next[productId] = quantity;
+      else delete next[productId];
+      return next;
+    });
+  }
+
+  function toggleFavorite(productId) {
+    setFavorites((current) => ({ ...current, [productId]: !current[productId] }));
+  }
+
+  const merchandiseActions = { bagQuantities, changeQuantity, favorites, toggleFavorite };
+
+  return (
+    <div className="app-shell">
+      <NavigationBar shopSearch={shopSearch} setShopSearch={setShopSearch} shopSearchDocked={shopSearchDocked} shopSearchMainRef={shopSearchMainRef} shopSearchDockRef={shopSearchDockRef} />
+      <Routes>
+        <Route path="/" element={<MobileHomePage {...merchandiseActions} />} />
+        <Route path="/shop" element={<MobileShopPage {...merchandiseActions} search={shopSearch} setSearch={setShopSearch} searchDocked={shopSearchDocked} setSearchDocked={setShopSearchDocked} searchMainRef={shopSearchMainRef} />} />
+        <Route path="/product/:slug" element={<MobileProductPage {...merchandiseActions} />} />
+        <Route path="*" element={<MobileHomePage {...merchandiseActions} />} />
+      </Routes>
+      <Footer />
+    </div>
+  );
 }
