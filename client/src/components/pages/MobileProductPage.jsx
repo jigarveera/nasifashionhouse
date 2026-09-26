@@ -101,10 +101,10 @@ function ProductDetails({ product, bagQuantities, bagLines, changeQuantity, favo
 
   async function shareProduct() {
     setGalleryInteracted(true);
-    const url = window.location.href;
+    const url = new URL(`/product/${encodeURIComponent(product.slug)}`, window.location.origin).href;
     if (navigator.share) {
       try {
-        await navigator.share({ title: product.name, text: product.description, url });
+        await navigator.share({ title: `${product.name} | Nasi Fashion House`, text: product.description, url });
         return;
       } catch (error) {
         if (error.name === 'AbortError') return;

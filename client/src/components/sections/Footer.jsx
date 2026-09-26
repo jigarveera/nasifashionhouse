@@ -1,5 +1,7 @@
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp, Mail, MapPin, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { legalPages, storeContact } from '../../data/legalPages';
+import InstagramIcon from '../ui/InstagramIcon';
 
 const exploreLinks = [
   { label: 'Home', to: '/' },
@@ -38,6 +40,19 @@ export default function Footer() {
               <h3>Categories</h3>
               {categoryLinks.map((link) => <Link key={link.to} to={link.to}>{link.label}</Link>)}
             </nav>
+
+            <nav className="footer-link-group footer-legal" aria-label="Legal pages">
+              <h3>Legal pages</h3>
+              {legalPages.map((page) => <Link key={page.slug} to={`/${page.slug}`}>{page.title}</Link>)}
+            </nav>
+
+            <div className="footer-link-group footer-contact">
+              <h3>Contact us</h3>
+              <a href={storeContact.mapUrl} target="_blank" rel="noopener noreferrer" aria-label={`Open map for ${storeContact.address}`}><MapPin size={17} aria-hidden="true" /><span>{storeContact.address}</span></a>
+              <a href={storeContact.phoneHref}><Phone size={17} aria-hidden="true" /><span>{storeContact.phoneDisplay}</span></a>
+              <a href={storeContact.emailHref}><Mail size={17} aria-hidden="true" /><span>{storeContact.email}</span></a>
+              <a href={storeContact.instagram} target="_blank" rel="noopener noreferrer" aria-label={`Nasi Fashion House on Instagram, ${storeContact.instagramHandle}`}><InstagramIcon size={17} /><span>{storeContact.instagramHandle}</span></a>
+            </div>
 
           </div>
 

@@ -13,6 +13,8 @@ import ShoppingSheet from './components/ui/ShoppingSheet';
 import PaymentPage from './components/pages/PaymentPage';
 import OrderConfirmationPage from './components/pages/OrderConfirmationPage';
 import { products } from './data/catalog';
+import { legalPages } from './data/legalPages';
+import PolicyPage from './components/pages/PolicyPage';
 
 export default function App() {
   const [bagLines, setBagLines] = useState(() => {
@@ -121,6 +123,7 @@ export default function App() {
         <Route path="/product/:slug" element={<MobileProductPage {...merchandiseActions} />} />
         <Route path="/checkout/payment" element={<PaymentPage bagLines={bagLines} address={selectedAddress} onOpenCart={() => openShoppingPanel('cart')} />} />
         <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+        {legalPages.map((page) => <Route key={page.slug} path={`/${page.slug}`} element={<PolicyPage page={page} />} />)}
         <Route path="*" element={<MobileHomePage {...merchandiseActions} search={shopSearch} setSearch={setShopSearch} searchDocked={shopSearchDocked} setSearchDocked={setShopSearchDocked} searchMainRef={shopSearchMainRef} />} />
       </Routes>
       <NewsletterSection />
