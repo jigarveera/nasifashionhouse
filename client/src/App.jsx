@@ -122,15 +122,15 @@ export default function App() {
       <NavigationBar shopSearch={shopSearch} setShopSearch={setShopSearch} shopSearchDocked={shopSearchDocked} shopSearchDockRef={shopSearchDockRef} authOpen={authOpen} previewProfile={previewProfile} onProfileClick={() => { setShoppingPanel(null); setAuthOpen(true); }} activePanel={shoppingPanel} onOpenPanel={openShoppingPanel} onClosePanel={closeShoppingPanel} cartCount={Object.values(bagLines).reduce((total, quantity) => total + quantity, 0)} wishlistCount={Object.values(favorites).filter(Boolean).length} />
       <Suspense fallback={<Loader />}>
         <Routes>
-          <Route path="/" element={<MobileHomePage {...merchandiseActions} search={shopSearch} setSearch={setShopSearch} searchDocked={shopSearchDocked} setSearchDocked={setShopSearchDocked} searchMainRef={shopSearchMainRef} />} />
+          {/* <Route path="/" element={<MobileHomePage {...merchandiseActions} search={shopSearch} setSearch={setShopSearch} searchDocked={shopSearchDocked} setSearchDocked={setShopSearchDocked} searchMainRef={shopSearchMainRef} />} />
           <Route path="/shop" element={<MobileShopPage {...merchandiseActions} search={shopSearch} setSearch={setShopSearch} searchDocked={shopSearchDocked} setSearchDocked={setShopSearchDocked} searchMainRef={shopSearchMainRef} />} />
           <Route path="/product/:slug" element={<MobileProductPage {...merchandiseActions} />} />
           <Route path="/checkout/payment" element={<PaymentPage bagLines={bagLines} address={selectedAddress} onOpenCart={() => openShoppingPanel('cart')} />} />
           <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
           {legalPages.map((page) => <Route key={page.slug} path={`/${page.slug}`} element={<PolicyPage page={page} />} />)}
-          <Route path="*" element={<MobileHomePage {...merchandiseActions} search={shopSearch} setSearch={setShopSearch} searchDocked={shopSearchDocked} setSearchDocked={setShopSearchDocked} searchMainRef={shopSearchMainRef} />} />
+          <Route path="*" element={<MobileHomePage {...merchandiseActions} search={shopSearch} setSearch={setShopSearch} searchDocked={shopSearchDocked} setSearchDocked={setShopSearchDocked} searchMainRef={shopSearchMainRef} />} /> */}
 
-           {/* <Route path='/' element={<ComingSoonPage />} /> */}
+           <Route path='/' element={<ComingSoonPage />} />
         </Routes>
       </Suspense>
       <NewsletterSection />
